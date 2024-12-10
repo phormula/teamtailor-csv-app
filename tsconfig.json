@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "sourceMap": true,
+    "target": "esnext",
+    "module": "nodenext",
+    "lib": ["es2022", "dom"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "nodenext",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": "./",
+    "rootDir": "./src",
+    "typeRoots": ["node_modules/@types", "types"]
+  },
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "nodenext"
+    }
+  },
+  "include": ["src", "src/swagger-output.json", "src/**/*.ts"],
+  "exclude": ["node_modules", "src/**/*.spec.ts"]
+}

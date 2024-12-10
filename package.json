@@ -1,0 +1,36 @@
+{
+  "name": "teamtailor",
+  "version": "1.0.0",
+  "description": "Fetch candidates with job application",
+  "main": "app.js",
+  "engines": {
+    "npm": ">=10.0.0",
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc && cp package.json dist/package.json && cp -r src/public dist",
+    "preview": "npm i && node dist/app.js",
+    "dev": "nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "json-2-csv": "^5.5.7",
+    "uuid": "^11.0.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.4",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
