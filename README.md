@@ -17,7 +17,7 @@ This project is a Node.js application that interacts with the Teamtailor API to 
 
 Before running the app, make sure you have the following installed:
 
-- [Node.js](https://nodejs.org/) (v16 or newer)
+- [Node.js](https://nodejs.org/) (v18 or newer)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 - A valid API key for the [Teamtailor API](https://developers.teamtailor.com/).
 
