@@ -3,40 +3,6 @@ import { objectToQueryParams } from '../helpers';
 import { CandidateData } from '../types/candidate.type';
 import { JsonApiResponse } from '../types/response';
 
-export const fetchAllCandidates = async () => {
-  const API_KEY = process.env.TEAMTAILOR_API_KEY;
-  const API_VERSION = process.env.TEAMTAILOR_API_VERSION;
-  const BASE_URL = process.env.TEAMTAILOR_BASE_URL;
-
-  const params = {
-    include: 'job-applications',
-    'fields[candidates]': 'id,first-name,last-name,email,job-applications',
-    'fields[job-applications]': 'id,created-at',
-    'page[size]': '30',
-  };
-  const headers = {
-    Authorization: `Token token=${API_KEY}`,
-    Accept: 'application/vnd.api+json',
-    'X-Api-Version': API_VERSION || '',
-  };
-
-  let candidates: JsonApiResponse[] = [];
-  let nextPage: string | null = `${BASE_URL}/candidates?${objectToQueryParams(params)}`;
-
-  while (nextPage) {
-    const response = await fetch(nextPage, { headers });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}: ${response.statusText}`);
-    }
-
-    const data: JsonApiResponse = await response.json();
-    candidates = [...candidates, data];
-    nextPage = data.links.next || null;
-  }
-
-  return candidates;
-};
-
 export const processCandidateData = (data: JsonApiResponse): CandidateData[] => {
   const candidates = data.data;
   const included = data.included;
@@ -73,4 +39,52 @@ export const processCandidateData = (data: JsonApiResponse): CandidateData[] => 
       job_application_created_at: format(app.created_at, 'yyyy-MM-dd HH:mm:ss XXX'),
     })),
   );
+};
+
+export const fetchAllCandidates = async () => {
+  const API_KEY = process.env.TEAMTAILOR_API_KEY;
+  const API_VERSION = process.env.TEAMTAILOR_API_VERSION;
+  const BASE_URL = process.env.TEAMTAILOR_BASE_URL;
+
+  const params = {
+    include: 'job-applications',
+    'fields[candidates]': 'id,first-name,last-name,email,job-applications',
+    'fields[job-applications]': 'id,created-at',
+    'page[size]': 30,
+  };
+
+  const headers = {
+    Authorization: `Token token=${API_KEY}`,
+    Accept: 'application/vnd.api+json',
+    'X-Api-Version': API_VERSION || '',
+  };
+
+  try {
+    const firstPageResponse = await fetch(`${BASE_URL}/candidates?${objectToQueryParams(params)}`, { headers });
+    if (!firstPageResponse.ok) {
+      throw new Error(`Error fetching first page: ${firstPageResponse.status}`);
+    }
+
+    const firstPageData: JsonApiResponse = await firstPageResponse.json();
+    const totalPages = firstPageData.meta['page-count'];
+    const remainingPageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).slice(1);
+
+    const fetchPage = async (page: number) => {
+      const url = `${BASE_URL}/candidates?${objectToQueryParams({ ...params, 'page[number]': page })}`;
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(`Error fetching page ${page}: ${response.status}`);
+      }
+      return await response.json();
+    };
+
+    const remainingPages = await Promise.all(remainingPageNumbers.map((page) => fetchPage(page)));
+
+    const allData: JsonApiResponse[] = [firstPageData, ...remainingPages];
+
+    return allData;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
 };
